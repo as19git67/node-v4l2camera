@@ -273,8 +273,6 @@ namespace {
 
         self->Wrap(thisObj);
         setValue(thisObj, "device", info[0]);
-        setValue(thisObj, "formats", cameraFormats(camera));
-        setValue(thisObj, "controls", cameraControls(camera));
     }
 
     NAN_METHOD(Camera::Start) {
@@ -299,6 +297,8 @@ namespace {
 
         setUint(thisObj, "width", camera->width);
         setUint(thisObj, "height", camera->height);
+        setValue(thisObj, "formats", cameraFormats(camera));
+        setValue(thisObj, "controls", cameraControls(camera));
         info.GetReturnValue().Set(thisObj);
     }
 
