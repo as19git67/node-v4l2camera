@@ -245,21 +245,21 @@ namespace {
       return;
     }
     const auto device = Nan::To<v8::String>(info[0]).ToLocalChecked();
-    auto camera = camera_open(*Nan::Utf8String(device));
-    if (!camera) {
+    auto fdCamera = camera_open(*Nan::Utf8String(device));
+    if (!fdCamera) {
       Nan::ThrowError(strerror(errno));
       return;
     }
-    camera->context.pointer = new LogContext;
-    camera->context.log = &logRecord;
+    fdCamera->context.pointer = new LogContext;
+    fdCamera->context.log = &logRecord;
 
     auto thisObj = info.This();
     auto self = new Camera;
-    self->camera = camera;
+    self->camera = fdCamera;
     self->Wrap(thisObj);
     setValue(thisObj, "device", info[0]);
-    setValue(thisObj, "formats", cameraFormats(camera));
-    setValue(thisObj, "controls", cameraControls(camera));
+    setValue(thisObj, "formats", cameraFormats(fdCamera));
+    setValue(thisObj, "controls", cameraControls(fdCamera));
   }
 
   NAN_METHOD(Camera::Start) {
@@ -283,17 +283,24 @@ namespace {
     };
     WatchCB(handle, callCallback);
   }
+
   NAN_METHOD(Camera::Stop) {
     auto camera = Nan::ObjectWrap::Unwrap<Camera>(info.Holder())->camera;
-    if (!camera_stop(camera)) {
-      Nan::ThrowError(cameraError(camera));
-      return;
+    if (camera) {
+      if (!camera_stop(camera)) {
+        Nan::ThrowError(cameraError(camera));
+        return;
+      }
+      auto ctx = static_cast<LogContext *>(camera->context.pointer);
+      camera_close(camera);
+      Nan::ObjectWrap::Unwrap<Camera>(info.Holder())->camera = NULL;
+      delete ctx;
     }
     Watch(info, StopCB);
   }
 
-  void Camera::CaptureCB(uv_poll_t* handle, int /*status*/, int /*events*/) {
-    auto callCallback = [](CallbackData* data) -> void {
+  void Camera::CaptureCB(uv_poll_t *handle, int /*status*/, int /*events*/) {
+    auto callCallback = [](CallbackData *data) -> void {
       Nan::HandleScope scope;
       auto thisObj = Nan::New<v8::Object>(data->thisObj);
       auto camera = Nan::ObjectWrap::Unwrap<Camera>(thisObj)->camera;
@@ -303,6 +310,7 @@ namespace {
     };
     WatchCB(handle, callCallback);
   }
+
   NAN_METHOD(Camera::Capture) {
     Watch(info, CaptureCB);
   }
