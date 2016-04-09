@@ -293,7 +293,7 @@ namespace {
       }
       auto ctx = static_cast<LogContext *>(camera->context.pointer);
       camera_close(camera);
-      Nan::ObjectWrap::Unwrap<Camera>(info.Holder())->camera = NULL;
+//      Nan::ObjectWrap::Unwrap<Camera>(info.Holder())->camera = NULL;
       delete ctx;
     }
     Watch(info, StopCB);
