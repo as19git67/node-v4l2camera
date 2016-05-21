@@ -285,16 +285,23 @@ namespace {
   }
 
   NAN_METHOD(Camera::Stop) {
+    printf("stopping camera\n");
     auto camera = Nan::ObjectWrap::Unwrap<Camera>(info.Holder())->camera;
     if (camera) {
+      printf("have camera\n");
       if (!camera_stop(camera)) {
+        printf("camera_stop failed\n");
         Nan::ThrowError(cameraError(camera));
         return;
       }
+      printf("camera_stop failed\n");
       auto ctx = static_cast<LogContext *>(camera->context.pointer);
+      printf("calling camera_close\n");
       camera_close(camera);
 //      Nan::ObjectWrap::Unwrap<Camera>(info.Holder())->camera = NULL;
+      printf("deleting ctx\n");
       delete ctx;
+      printf("delete ctx ok\n");
     }
     Watch(info, StopCB);
   }
