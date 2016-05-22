@@ -171,9 +171,12 @@ static bool camera_load(camera_t* camera)
 
 bool camera_stop(camera_t* camera)
 {
+  printf("in camera_stop\n");
   enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  if (xioctl(camera->fd, VIDIOC_STREAMOFF, &type) == -1) 
+  printf("before xioctl\n");
+  if (xioctl(camera->fd, VIDIOC_STREAMOFF, &type) == -1)
     return error(camera, "VIDIOC_STREAMOFF");
+  printf("before camera_buffer_finish\n");
   camera_buffer_finish(camera);
   
   struct v4l2_requestbuffers req;
@@ -181,8 +184,10 @@ bool camera_stop(camera_t* camera)
   req.count = 0;
   req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   req.memory = V4L2_MEMORY_MMAP;
+  printf("before xioctl\n");
   if (xioctl(camera->fd, VIDIOC_REQBUFS, &req) == -1)
     return error(camera, "VIDIOC_REQBUFS 0");
+  printf("return true\n");
   return true;
 }
 
