@@ -51,7 +51,8 @@ camera_t* camera_open(const char * device)
 {
   int fd = open(device, O_RDWR | O_NONBLOCK, 0);
   if (fd == -1) return NULL;
-  
+  printf("camera_open fd %d\n", fd);
+
   camera_t* camera = malloc(sizeof (camera_t));
   camera->fd = fd;
   camera->initialized = false;
