@@ -174,6 +174,10 @@ bool camera_stop(camera_t* camera)
   printf("in camera_stop\n");
   enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   printf("before xioctl\n");
+  if (camera != NULL) {
+    printf("camera->fd %d\n", camera->fd);
+
+  }
   if (xioctl(camera->fd, VIDIOC_STREAMOFF, &type) == -1)
     return error(camera, "VIDIOC_STREAMOFF");
   printf("before camera_buffer_finish\n");
