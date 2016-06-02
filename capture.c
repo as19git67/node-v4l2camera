@@ -184,6 +184,7 @@ bool camera_stop(camera_t* camera)
   printf("before camera_buffer_finish\n");
   camera_buffer_finish(camera);
   
+/*
   struct v4l2_requestbuffers req;
   memset(&req, 0, sizeof req);
   req.count = 0;
@@ -192,6 +193,7 @@ bool camera_stop(camera_t* camera)
   printf("before xioctl\n");
   if (xioctl(camera->fd, VIDIOC_REQBUFS, &req) == -1)
     return error(camera, "VIDIOC_REQBUFS 0");
+*/
   printf("return true\n");
   return true;
 }
